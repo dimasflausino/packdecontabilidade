@@ -1,7 +1,7 @@
-{
+json{
   "usuarios": [
     {
-      "usuario": "brunonascimento",
+      "usuario": "admin",
       "senha": "admin123",
       "nome": "Administrador",
       "plano": "pro",
@@ -9,11 +9,11 @@
       "ativo": true
     },
     {
-      "usuario": "dimasflausino",
-      "senha": "admin123",
+      "usuario": "teste1",
+      "senha": "eh2026",
       "nome": "Usuário Teste",
-      "plano": "diagnostico",
-      "limite_msgs": 10,
+      "plano": "pro",
+      "limite_msgs": null,
       "ativo": true
     },
     {
