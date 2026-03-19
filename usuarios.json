@@ -1,0 +1,28 @@
+{
+  "usuarios": [
+    {
+      "usuario": "brunonascimento",
+      "senha": "admin123",
+      "nome": "Administrador",
+      "plano": "pro",
+      "limite_msgs": null,
+      "ativo": true
+    },
+    {
+      "usuario": "dimasflausino",
+      "senha": "admin123",
+      "nome": "Usuário Teste",
+      "plano": "diagnostico",
+      "limite_msgs": 10,
+      "ativo": true
+    },
+    {
+      "usuario": "contador@clinica.com",
+      "senha": "ehpro2026",
+      "nome": "Contador Pro",
+      "plano": "pro",
+      "limite_msgs": null,
+      "ativo": true
+    }
+  ]
+}

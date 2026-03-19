@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agente Comercial — EH Pro</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #08090f; --surface: #0f1018; --surface2: #14151f;
+    --border: #1e2035; --text: #e8eaf5; --muted: #6b6e8a;
+    --gold: #f0b429; --gold-dim: rgba(240,180,41,0.35); --gold-glow: rgba(240,180,41,0.10);
+    --green: #2ecc71; --green-dim: #1a7a42; --green-glow: rgba(46,204,113,0.10);
+    --user-bg-gold: #1e1a08; --user-bg-green: #0e1e12;
+    --error: #e74c3c;
+  }
+  body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+
+  /* HEADER */
+  header { padding: 12px 18px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; background: var(--surface); flex-shrink: 0; }
+  .back-btn { background: transparent; border: 1px solid var(--border); color: var(--muted); padding: 5px 10px; border-radius: 7px; font-size: 11px; cursor: pointer; transition: all 0.2s; font-family: 'DM Sans', sans-serif; }
+  .back-btn:hover { border-color: var(--gold); color: var(--gold); }
+  .logo-mark { width: 34px; height: 34px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-family: 'Syne', sans-serif; font-weight: 800; font-size: 13px; color: #000; transition: background 0.3s; }
+  .logo-mark.gold { background: linear-gradient(135deg, #b8860b, #f0b429); }
+  .logo-mark.green { background: linear-gradient(135deg, #1a7a42, #2ecc71); color: #fff; }
+  .header-info h1 { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 13px; }
+  .header-info p { font-size: 10px; color: var(--muted); margin-top: 1px; }
+  .header-right { margin-left: auto; }
+
+  /* MODE SWITCHER */
+  .mode-bar { padding: 10px 18px; border-bottom: 1px solid var(--border); background: var(--surface2); display: flex; gap: 8px; align-items: center; flex-shrink: 0; }
+  .mode-label { font-size: 11px; color: var(--muted); margin-right: 4px; }
+  .mode-btn {
+    padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 600;
+    border: 1px solid var(--border); background: transparent; color: var(--muted);
+    cursor: pointer; transition: all 0.2s; font-family: 'DM Sans', sans-serif;
+  }
+  .mode-btn.active-gold { background: var(--gold-glow); border-color: var(--gold-dim); color: var(--gold); }
+  .mode-btn.active-green { background: var(--green-glow); border-color: var(--green-dim); color: var(--green); }
+  .mode-desc { font-size: 11px; color: var(--muted); margin-left: auto; }
+
+  /* CHAT */
+  #chat { flex: 1; overflow-y: auto; padding: 20px 16px; display: flex; flex-direction: column; gap: 18px; scroll-behavior: smooth; }
+  #chat::-webkit-scrollbar { width: 4px; }
+  #chat::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+  .welcome-card { border-radius: 14px; padding: 20px; display: flex; flex-direction: column; gap: 14px; }
+  .welcome-card.gold { background: var(--surface2); border: 1px solid var(--border); border-top: 3px solid var(--gold); }
+  .welcome-card.green { background: var(--surface2); border: 1px solid var(--border); border-top: 3px solid var(--green); }
+  .welcome-card h2.gold { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 15px; color: var(--gold); }
+  .welcome-card h2.green { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 15px; color: var(--green); }
+  .welcome-card p { font-size: 13px; line-height: 1.7; color: var(--muted); }
+  .chips { display: flex; flex-wrap: wrap; gap: 7px; }
+  .chip-gold { background: var(--gold-glow); border: 1px solid var(--gold-dim); color: var(--gold); padding: 5px 11px; border-radius: 20px; font-size: 11.5px; cursor: pointer; transition: all 0.2s; }
+  .chip-gold:hover { background: rgba(240,180,41,0.2); }
+  .chip-green { background: var(--green-glow); border: 1px solid var(--green-dim); color: var(--green); padding: 5px 11px; border-radius: 20px; font-size: 11.5px; cursor: pointer; transition: all 0.2s; }
+  .chip-green:hover { background: rgba(46,204,113,0.2); }
+
+  .msg { display: flex; flex-direction: column; max-width: 88%; animation: fadeIn 0.3s ease; }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+  .msg.user { align-self: flex-end; }
+  .msg.assistant { align-self: flex-start; }
+  .msg-label { font-size: 10px; color: var(--muted); margin-bottom: 4px; letter-spacing: 0.08em; text-transform: uppercase; }
+  .msg.user .msg-label { text-align: right; }
+  .bubble { padding: 12px 15px; border-radius: 13px; font-size: 13.5px; line-height: 1.7; }
+  .msg.user .bubble { border-bottom-right-radius: 4px; color: var(--text); }
+  .msg.user.modo-diagnostico .bubble { background: var(--user-bg-gold); border: 1px solid rgba(240,180,41,0.15); }
+  .msg.user.modo-interno .bubble { background: var(--user-bg-green); border: 1px solid rgba(46,204,113,0.15); }
+  .msg.assistant .bubble { background: var(--surface); border: 1px solid var(--border); color: var(--text); border-bottom-left-radius: 4px; }
+  .bubble strong.gold { color: var(--gold); font-weight: 600; }
+  .bubble strong.green { color: var(--green); font-weight: 600; }
+  .bubble strong { color: var(--gold); font-weight: 600; }
+
+  .typing-indicator { display: flex; gap: 5px; padding: 13px 15px; background: var(--surface); border: 1px solid var(--border); border-radius: 13px; border-bottom-left-radius: 4px; width: fit-content; }
+  .typing-indicator span { width: 6px; height: 6px; background: var(--muted); border-radius: 50%; animation: bounce 1.2s infinite; }
+  .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+  .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes bounce { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-6px)} }
+
+  /* INPUT */
+  .input-area { padding: 12px 14px; border-top: 1px solid var(--border); background: var(--surface); flex-shrink: 0; transition: all 0.3s; }
+  .input-row { display: flex; gap: 10px; align-items: flex-end; background: var(--surface2); border: 1px solid var(--border); border-radius: 13px; padding: 9px 13px; transition: border-color 0.2s; }
+  .input-row.gold:focus-within { border-color: var(--gold-dim); }
+  .input-row.green:focus-within { border-color: var(--green-dim); }
+  #userInput { flex: 1; background: transparent; border: none; outline: none; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 13.5px; resize: none; max-height: 120px; line-height: 1.5; }
+  #userInput::placeholder { color: var(--muted); }
+  #sendBtn { width: 32px; height: 32px; border: none; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.3s; }
+  #sendBtn.gold { background: var(--gold); }
+  #sendBtn.green { background: var(--green); }
+  #sendBtn:hover { opacity: 0.85; }
+  #sendBtn:disabled { opacity: 0.3; cursor: default; }
+  #sendBtn svg { width: 15px; height: 15px; fill: #000; }
+  #sendBtn.green svg { fill: #fff; }
+  .disclaimer { text-align: center; font-size: 10px; color: var(--muted); margin-top: 7px; opacity: 0.6; }
+</style>
+</head>
+<body>
+
+<header>
+  <button class="back-btn" onclick="window.location.href='./dashboard.html'">← Voltar</button>
+  <div class="logo-mark gold" id="logo">💼</div>
+  <div class="header-info">
+    <h1>Agente Comercial</h1>
+    <p id="header-sub">Equiparação Hospitalar · Modo Diagnóstico</p>
+  </div>
+</header>
+
+<div class="mode-bar">
+  <span class="mode-label">Modo:</span>
+  <button class="mode-btn active-gold" id="btn-diagnostico" onclick="setModo('diagnostico')">🧠 Diagnóstico</button>
+  <button class="mode-btn" id="btn-interno" onclick="setModo('interno')">⚙️ Interno</button>
+  <span class="mode-desc" id="mode-desc">Pré-venda · Avaliação de potencial</span>
+</div>
+
+<div id="chat"></div>
+
+<div class="input-area">
+  <div class="input-row gold" id="inputRow">
+    <textarea id="userInput" rows="1" placeholder="Descreva o caso do médico ou clínica..." oninput="autoResize(this)" onkeydown="handleKey(event)"></textarea>
+    <button id="sendBtn" class="gold" onclick="sendMessage()">
+      <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+    </button>
+  </div>
+  <p class="disclaimer" id="disclaimer-text">Agente de Diagnóstico · Identifica potencial, não executa</p>
+</div>
+
+<script>
+const PROMPTS = {
+  diagnostico: `Você é o AGENTE DE DIAGNÓSTICO EM EQUIPARAÇÃO HOSPITALAR.
+
+PAPEL: Identificar POTENCIAL de equiparação hospitalar. Você não executa, não aprofunda sem dados completos, não promete resultado.
+
+TOM: Comercial-consultivo. Fala a língua do mercado. Traduz técnica em valor percebido. Ajuda o contador a conduzir a conversa com médicos ocupados e céticos.
+
+FUNÇÃO PRINCIPAL:
+- Avaliar rapidamente se o médico ou clínica tem potencial para equiparação
+- Retornar: viabilidade (ALTO / MÉDIO / BAIXO), alertas de risco, se vale aprofundar
+- Gerar autoridade e confiança — você ABRE PORTAS, não fecha contratos
+
+QUANDO AVALIAR, PERGUNTE (se não informado):
+- Qual a especialidade e tipo de procedimentos?
+- A clínica tem estrutura física própria (equipamentos, salas, equipe)?
+- Há internação, sedação, anestesia ou procedimentos invasivos?
+- Qual o faturamento anual aproximado?
+- Qual o regime tributário atual?
+
+ESTRUTURA DE RESPOSTA:
+1. Potencial: ALTO / MÉDIO / BAIXO (com justificativa rápida)
+2. O que favorece a equiparação
+3. Pontos de atenção / riscos
+4. Próximo passo recomendado
+
+NUNCA aprofunde execução aqui. Nunca prometa economia exata. Sempre sinalize quando vale ir para análise técnica completa.
+
+CONTEXTO TÉCNICO:
+- Equiparação exige estrutura hospitalar: equipamentos, processos, ambiente clínico
+- Especialidades com maior potencial: cirurgia, anestesiologia, ortopedia, oftalmologia, odontologia cirúrgica, oncologia
+- Principais CNAEs: 8610-1/01, 8610-1/02, 8621-6/02, 8630-5/01
+- Benefício: presunção de 8% vs 32% no Lucro Presumido
+- Risco: Receita Federal pode questionar sem documentação robusta
+
+Responda em português brasileiro. Seja direto, comercial e confiável.`,
+
+  interno: `Você é o AGENTE INTERNO DE EQUIPARAÇÃO HOSPITALAR.
+
+PAPEL: Reduzir risco, orientar execução e proteger o contador no pós-venda. Você atua APÓS o fechamento do serviço.
+
+TOM: Técnico, protetor, preciso. Você é o compliance do contador. Nunca minimiza riscos.
+
+FUNÇÃO PRINCIPAL:
+- Orientar a execução correta da equiparação
+- Alertar sobre pontos críticos de atenção
+- Ajudar na organização de documentação e contratos
+- Evitar erros que geram autuação
+- Preparar o contador para fiscalizações e questionamentos
+- Manter postura técnica e defensável
+
+FRENTES DE ATUAÇÃO:
+1. Checklist de implantação — o que precisa estar em ordem
+2. Documentação mínima necessária
+3. Erros comuns que geram autuação
+4. Como manter a equiparação sustentável ao longo do tempo
+5. O que fazer se vier fiscalização ou questionamento
+6. Contratos e responsabilidades entre escritório e clínica
+
+ESTRUTURA DE RESPOSTA:
+1. Orientação técnica clara
+2. Pontos críticos de atenção
+3. Alertas de risco (nunca omite)
+4. Ação recomendada
+
+CONTEXTO TÉCNICO:
+- Equiparação exige manutenção contínua — não é só um enquadramento inicial
+- Documentação crítica: laudos técnicos, CEVS, alvarás sanitários, contratos de prestação de serviço, comprovação de estrutura
+- Erros comuns: clínica muda de endereço sem atualizar, médicos PJ sem contrato formal, faturamento sem segregação adequada
+- Em fiscalização: nunca improvise, sempre tenha laudo técnico e histórico documentado
+- Responsabilidade contábil do escritório precisa estar clara em contrato
+
+Responda em português brasileiro. Seja técnico, protetor e nunca omita riscos.`
+};
+
+let modo = 'diagnostico';
+let conversationHistory = [];
+let isLoading = false;
+
+const raw = sessionStorage.getItem('eh_usuario');
+if (!raw) window.location.href = './index.html';
+const sessao = JSON.parse(raw || '{}');
+
+const chatEl = document.getElementById('chat');
+
+function setModo(novoModo) {
+  modo = novoModo;
+  conversationHistory = [];
+  chatEl.innerHTML = '';
+
+  const isDiag = modo === 'diagnostico';
+
+  // Botões
+  document.getElementById('btn-diagnostico').className = 'mode-btn' + (isDiag ? ' active-gold' : '');
+  document.getElementById('btn-interno').className = 'mode-btn' + (!isDiag ? ' active-green' : '');
+
+  // Header
+  document.getElementById('header-sub').textContent = isDiag
+    ? 'Equiparação Hospitalar · Modo Diagnóstico'
+    : 'Equiparação Hospitalar · Modo Interno';
+  document.getElementById('mode-desc').textContent = isDiag
+    ? 'Pré-venda · Avaliação de potencial'
+    : 'Pós-venda · Execução e segurança';
+
+  // Logo
+  const logo = document.getElementById('logo');
+  logo.textContent = isDiag ? '🧠' : '⚙️';
+  logo.className = 'logo-mark ' + (isDiag ? 'gold' : 'green');
+
+  // Input
+  document.getElementById('inputRow').className = 'input-row ' + (isDiag ? 'gold' : 'green');
+  document.getElementById('sendBtn').className = isDiag ? 'gold' : 'green';
+  document.getElementById('userInput').placeholder = isDiag
+    ? 'Descreva o caso do médico ou clínica...'
+    : 'Qual a situação pós-venda? Como posso ajudar?';
+  document.getElementById('disclaimer-text').textContent = isDiag
+    ? 'Agente de Diagnóstico · Identifica potencial, não executa'
+    : 'Agente Interno · Execução e segurança · Pós-venda';
+
+  // Welcome card
+  renderWelcome();
+}
+
+function renderWelcome() {
+  const isDiag = modo === 'diagnostico';
+  const div = document.createElement('div');
+  div.className = 'welcome-card ' + (isDiag ? 'gold' : 'green');
+
+  if (isDiag) {
+    div.innerHTML = `
+      <h2 class="gold">🧠 Agente de Diagnóstico</h2>
+      <p>Avalio rapidamente o <strong style="color:var(--gold)">potencial de equiparação hospitalar</strong> de qualquer médico ou clínica. Uso esse agente na <strong style="color:var(--gold)">pré-venda</strong> — primeira conversa, reunião exploratória, conteúdo estratégico.</p>
+      <div class="chips">
+        <div class="chip-gold" onclick="sendChip(this)">Clínica cirúrgica com centro cirúrgico</div>
+        <div class="chip-gold" onclick="sendChip(this)">Médico autônomo com consultório</div>
+        <div class="chip-gold" onclick="sendChip(this)">Clínica de oftalmologia com laser</div>
+        <div class="chip-gold" onclick="sendChip(this)">Odontologia com sedação</div>
+        <div class="chip-gold" onclick="sendChip(this)">Clínica de oncologia</div>
+      </div>`;
+  } else {
+    div.innerHTML = `
+      <h2 class="green">⚙️ Agente Interno</h2>
+      <p>Atuo no <strong style="color:var(--green)">pós-venda e execução</strong>. Ajudo o contador a estruturar, validar e manter a equiparação com segurança. Uso esse agente depois que o cliente fechou.</p>
+      <div class="chips">
+        <div class="chip-green" onclick="sendChip(this)">Checklist de implantação</div>
+        <div class="chip-green" onclick="sendChip(this)">Documentação necessária</div>
+        <div class="chip-green" onclick="sendChip(this)">Erros que geram autuação</div>
+        <div class="chip-green" onclick="sendChip(this)">O que fazer em fiscalização</div>
+        <div class="chip-green" onclick="sendChip(this)">Contrato com a clínica</div>
+      </div>`;
+  }
+
+  chatEl.appendChild(div);
+}
+
+function autoResize(el) { el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,120)+'px'; }
+function handleKey(e) { if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage();} }
+function sendChip(el) { document.getElementById('userInput').value=el.textContent; sendMessage(); }
+
+function addMessage(role, html) {
+  const div = document.createElement('div');
+  const modoClass = modo === 'diagnostico' ? 'modo-diagnostico' : 'modo-interno';
+  div.className = `msg ${role} ${role==='user'?modoClass:''}`;
+  const label = role==='user' ? sessao.nome : (modo==='diagnostico'?'Diagnóstico EH':'Agente Interno EH');
+  div.innerHTML = `<div class="msg-label">${label}</div><div class="bubble">${html}</div>`;
+  chatEl.appendChild(div);
+  chatEl.scrollTop = chatEl.scrollHeight;
+}
+
+function showTyping() {
+  const div = document.createElement('div');
+  div.className='msg assistant'; div.id='typing';
+  const label = modo==='diagnostico'?'Diagnóstico EH':'Agente Interno EH';
+  div.innerHTML=`<div class="msg-label">${label}</div><div class="typing-indicator"><span></span><span></span><span></span></div>`;
+  chatEl.appendChild(div); chatEl.scrollTop=chatEl.scrollHeight;
+}
+
+function removeTyping() { const t=document.getElementById('typing'); if(t) t.remove(); }
+
+function formatResponse(text) {
+  const cor = modo==='diagnostico' ? 'var(--gold)' : 'var(--green)';
+  return text
+    .replace(/\*\*(.+?)\*\*/g,`<strong style="color:${cor}">$1</strong>`)
+    .replace(/\*(.+?)\*/g,'<em>$1</em>')
+    .replace(/^## (.+)$/gm,`<strong style="color:${cor};font-size:14px;display:block;margin-top:12px;margin-bottom:5px;">$1</strong>`)
+    .replace(/^### (.+)$/gm,'<strong style="font-size:13px;display:block;margin-top:8px;margin-bottom:3px;">$1</strong>')
+    .replace(/^[-•] (.+)$/gm,'<li>$1</li>')
+    .replace(/(<li>.*?<\/li>\n?)+/gs,m=>`<ul style="padding-left:18px;margin:6px 0;">${m}</ul>`)
+    .replace(/\n\n/g,'<br><br>').replace(/\n/g,'<br>');
+}
+
+async function sendMessage() {
+  const inputEl = document.getElementById('userInput');
+  const text = inputEl.value.trim();
+  if (!text || isLoading) return;
+  inputEl.value=''; inputEl.style.height='auto';
+  isLoading=true; document.getElementById('sendBtn').disabled=true;
+  addMessage('user', text.replace(/</g,'&lt;'));
+  conversationHistory.push({role:'user',content:text});
+  showTyping();
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:PROMPTS[modo],messages:conversationHistory})
+    });
+    const data = await res.json();
+    removeTyping();
+    const reply = data.content?.[0]?.text || 'Erro ao processar.';
+    conversationHistory.push({role:'assistant',content:reply});
+    addMessage('assistant', formatResponse(reply));
+  } catch(e) {
+    removeTyping();
+    addMessage('assistant','⚠️ Erro de conexão. Tente novamente.');
+  }
+  isLoading=false; document.getElementById('sendBtn').disabled=false;
+  document.getElementById('userInput').focus();
+}
+
+// Init
+setModo('diagnostico');
+</script>
+</body>
+</html>

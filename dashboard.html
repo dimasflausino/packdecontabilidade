@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EH Pro — Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #08090f;
+    --surface: #0f1018;
+    --surface2: #14151f;
+    --border: #1e2035;
+    --blue: #4f7fff;
+    --blue-dim: #2a4db0;
+    --blue-glow: rgba(79,127,255,0.10);
+    --text: #e8eaf5;
+    --muted: #6b6e8a;
+    --gold: #f0b429;
+    --gold-glow: rgba(240,180,41,0.10);
+    --gold-dim: rgba(240,180,41,0.35);
+    --green: #2ecc71;
+    --error: #e74c3c;
+  }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(79,127,255,0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(79,127,255,0.025) 1px, transparent 1px);
+    background-size: 44px 44px;
+    pointer-events: none;
+    z-index: 0;
+  }
+  header {
+    padding: 14px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--surface);
+    position: relative;
+    z-index: 1;
+    flex-shrink: 0;
+  }
+  .logo-mark {
+    width: 36px; height: 36px;
+    background: linear-gradient(135deg, #2a4db0, #4f7fff);
+    border-radius: 9px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Syne', sans-serif;
+    font-weight: 800; font-size: 14px; color: #fff;
+  }
+  .header-info h1 { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 14px; }
+  .header-info p { font-size: 11px; color: var(--muted); margin-top: 1px; }
+  .header-right { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+  .badge {
+    padding: 3px 10px; border-radius: 20px;
+    font-size: 10px; font-weight: 700;
+    letter-spacing: 0.08em; text-transform: uppercase;
+  }
+  .badge-pro { background: var(--blue-glow); border: 1px solid var(--blue-dim); color: var(--blue); }
+  .badge-diagnostico { background: var(--gold-glow); border: 1px solid var(--gold-dim); color: var(--gold); }
+  .btn-sair {
+    background: transparent; border: 1px solid var(--border);
+    color: var(--muted); padding: 5px 12px; border-radius: 7px;
+    font-size: 11px; cursor: pointer; transition: all 0.2s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .btn-sair:hover { border-color: var(--error); color: var(--error); }
+
+  main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .welcome {
+    text-align: center;
+    margin-bottom: 48px;
+  }
+  .welcome h2 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 26px;
+    color: var(--text);
+    margin-bottom: 10px;
+  }
+  .welcome p { font-size: 14px; color: var(--muted); max-width: 440px; line-height: 1.6; }
+
+  .agents-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    width: 100%;
+    max-width: 700px;
+  }
+
+  .agent-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 28px 26px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    cursor: pointer;
+    transition: all 0.25s;
+    position: relative;
+    overflow: hidden;
+    text-decoration: none;
+  }
+  .agent-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    border-radius: 18px 18px 0 0;
+  }
+  .agent-card.blue::before { background: linear-gradient(90deg, #2a4db0, #4f7fff); }
+  .agent-card.gold::before { background: linear-gradient(90deg, #b8860b, #f0b429); }
+
+  .agent-card:hover {
+    border-color: #2a3050;
+    transform: translateY(-3px);
+    box-shadow: 0 16px 40px rgba(0,0,0,0.3);
+  }
+  .agent-card.locked { opacity: 0.45; cursor: not-allowed; }
+  .agent-card.locked:hover { transform: none; box-shadow: none; }
+
+  .agent-icon {
+    width: 48px; height: 48px;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+  }
+  .agent-icon.blue { background: var(--blue-glow); border: 1px solid var(--blue-dim); }
+  .agent-icon.gold { background: var(--gold-glow); border: 1px solid var(--gold-dim); }
+
+  .agent-card h3 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    color: var(--text);
+  }
+  .agent-card p { font-size: 13px; color: var(--muted); line-height: 1.6; }
+
+  .agent-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+  .tag {
+    font-size: 10.5px;
+    padding: 3px 9px;
+    border-radius: 20px;
+    font-weight: 500;
+  }
+  .tag-blue { background: var(--blue-glow); border: 1px solid var(--blue-dim); color: var(--blue); }
+  .tag-gold { background: var(--gold-glow); border: 1px solid var(--gold-dim); color: var(--gold); }
+
+  .agent-cta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: auto;
+  }
+  .btn-acessar {
+    padding: 8px 18px;
+    border-radius: 8px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 12px;
+    border: none;
+    cursor: pointer;
+    transition: opacity 0.2s;
+    letter-spacing: 0.02em;
+  }
+  .btn-acessar.blue { background: var(--blue); color: #fff; }
+  .btn-acessar.gold { background: var(--gold); color: #000; }
+  .btn-acessar:hover { opacity: 0.85; }
+
+  .lock-msg { font-size: 11px; color: var(--muted); }
+
+  .footer-dash {
+    text-align: center;
+    font-size: 11px;
+    color: var(--muted);
+    padding: 20px;
+    opacity: 0.6;
+    position: relative;
+    z-index: 1;
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="logo-mark">EH</div>
+  <div class="header-info">
+    <h1>Equiparação Hospitalar Pro</h1>
+    <p id="header-sub">Plataforma para contadores</p>
+  </div>
+  <div class="header-right">
+    <span class="badge" id="badge-plano">—</span>
+    <button class="btn-sair" onclick="sair()">Sair</button>
+  </div>
+</header>
+
+<main>
+  <div class="welcome">
+    <h2 id="welcome-msg">Bem-vindo 👋</h2>
+    <p>Escolha o agente que deseja usar. Cada um foi desenhado para uma etapa específica do seu trabalho com equiparação hospitalar.</p>
+  </div>
+
+  <div class="agents-grid">
+    <!-- Agente 1: Especialista Técnico -->
+    <div class="agent-card blue" id="card-especialista" onclick="abrirAgente('especialista.html')">
+      <div class="agent-icon blue">🏥</div>
+      <h3>Especialista Técnico</h3>
+      <p>Análise de elegibilidade, argumentação fiscal, estruturação do serviço e suporte completo ao contador.</p>
+      <div class="agent-tags">
+        <span class="tag tag-blue">Elegibilidade</span>
+        <span class="tag tag-blue">Fiscal</span>
+        <span class="tag tag-blue">Estruturação</span>
+        <span class="tag tag-blue">Pós-venda</span>
+      </div>
+      <div class="agent-cta">
+        <button class="btn-acessar blue">Acessar agente →</button>
+      </div>
+    </div>
+
+    <!-- Agente 2: Comercial -->
+    <div class="agent-card gold" id="card-comercial" onclick="abrirAgente('comercial.html')">
+      <div class="agent-icon gold">💼</div>
+      <h3>Agente Comercial</h3>
+      <p>Diagnóstico rápido de potencial e suporte à execução. Dois modos: pré-venda e operação interna.</p>
+      <div class="agent-tags">
+        <span class="tag tag-gold">Diagnóstico</span>
+        <span class="tag tag-gold">Pré-venda</span>
+        <span class="tag tag-gold">Execução</span>
+        <span class="tag tag-gold">Retenção</span>
+      </div>
+      <div class="agent-cta">
+        <button class="btn-acessar gold">Acessar agente →</button>
+      </div>
+    </div>
+  </div>
+</main>
+
+<div class="footer-dash">Equiparação Hospitalar Pro · Plataforma exclusiva para contadores</div>
+
+<script>
+function initDashboard() {
+  const raw = sessionStorage.getItem('eh_usuario');
+  if (!raw) { window.location.href = './index.html'; return; }
+  const sessao = JSON.parse(raw);
+
+  document.getElementById('welcome-msg').textContent = 'Olá, ' + sessao.nome.split(' ')[0] + ' 👋';
+  document.getElementById('header-sub').textContent = 'Plataforma para contadores';
+
+  const badge = document.getElementById('badge-plano');
+  if (sessao.plano === 'pro') {
+    badge.textContent = 'Pro';
+    badge.className = 'badge badge-pro';
+  } else {
+    badge.textContent = 'Diagnóstico';
+    badge.className = 'badge badge-diagnostico';
+    // Bloqueia agente especialista no plano diagnóstico
+    const cardEsp = document.getElementById('card-especialista');
+    cardEsp.classList.add('locked');
+    cardEsp.onclick = null;
+    cardEsp.querySelector('.agent-cta').innerHTML = '<span class="lock-msg">🔒 Disponível no plano Pro</span>';
+  }
+}
+
+function abrirAgente(pagina) {
+  window.location.href = './' + pagina;
+}
+
+function sair() {
+  sessionStorage.removeItem('eh_usuario');
+  window.location.href = './index.html';
+}
+
+initDashboard();
+</script>
+</body>
+</html>

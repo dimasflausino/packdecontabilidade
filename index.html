@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EH Pro — Acesso</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #08090f;
+    --surface: #0f1018;
+    --surface2: #14151f;
+    --border: #1e2035;
+    --blue: #4f7fff;
+    --blue-dim: #2a4db0;
+    --blue-glow: rgba(79,127,255,0.10);
+    --text: #e8eaf5;
+    --muted: #6b6e8a;
+    --error: #e74c3c;
+    --gold: #f0b429;
+  }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    position: relative;
+    overflow: hidden;
+  }
+  body::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(79,127,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(79,127,255,0.03) 1px, transparent 1px);
+    background-size: 44px 44px;
+    pointer-events: none;
+  }
+  body::after {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 700px; height: 700px;
+    background: radial-gradient(circle, rgba(79,127,255,0.05) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 40px 36px;
+    width: 100%;
+    max-width: 400px;
+    position: relative;
+    z-index: 1;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.5);
+  }
+  .logo-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 32px;
+  }
+  .logo-mark {
+    width: 56px; height: 56px;
+    background: linear-gradient(135deg, #2a4db0, #4f7fff);
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 18px;
+    color: #fff;
+    box-shadow: 0 8px 24px rgba(79,127,255,0.3);
+    letter-spacing: -0.5px;
+  }
+  .logo-area h1 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 19px;
+    color: var(--text);
+    text-align: center;
+  }
+  .logo-area p {
+    font-size: 12px;
+    color: var(--muted);
+    text-align: center;
+  }
+  .field { margin-bottom: 16px; }
+  label {
+    display: block;
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 7px;
+    font-weight: 500;
+  }
+  input {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 14px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  input:focus { border-color: var(--blue-dim); }
+  input::placeholder { color: var(--muted); }
+  .error-msg {
+    background: rgba(231,76,60,0.1);
+    border: 1px solid rgba(231,76,60,0.3);
+    color: var(--error);
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    margin-bottom: 16px;
+    display: none;
+  }
+  .btn {
+    width: 100%;
+    background: var(--blue);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 13px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.1s;
+    letter-spacing: 0.02em;
+    margin-top: 8px;
+  }
+  .btn:hover { opacity: 0.88; }
+  .btn:active { transform: scale(0.98); }
+  .btn:disabled { opacity: 0.4; cursor: default; }
+  .footer-text {
+    text-align: center;
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 24px;
+    line-height: 1.6;
+  }
+  .badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .badge-diagnostico {
+    background: rgba(240,180,41,0.12);
+    border: 1px solid rgba(240,180,41,0.3);
+    color: var(--gold);
+  }
+  .badge-pro {
+    background: var(--blue-glow);
+    border: 1px solid var(--blue-dim);
+    color: var(--blue);
+  }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="logo-area">
+    <div class="logo-mark">EH</div>
+    <h1>Equiparação Hospitalar Pro</h1>
+    <p>Plataforma especializada para contadores</p>
+  </div>
+  <div class="field">
+    <label>Usuário</label>
+    <input type="text" id="usuario" placeholder="seu@email.com ou usuário" autocomplete="username" />
+  </div>
+  <div class="field">
+    <label>Senha</label>
+    <input type="password" id="senha" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter') fazer_login()" />
+  </div>
+  <div class="error-msg" id="erro"></div>
+  <button class="btn" id="btnLogin" onclick="fazer_login()">Entrar</button>
+  <div class="footer-text">
+    Planos: <span class="badge badge-diagnostico">Diagnóstico</span> · <span class="badge badge-pro">Pro</span><br>
+    Para adquirir acesso, entre em contato.
+  </div>
+</div>
+<script>
+async function fazer_login() {
+  const usuario = document.getElementById('usuario').value.trim().toLowerCase();
+  const senha = document.getElementById('senha').value.trim();
+  const btn = document.getElementById('btnLogin');
+  const erro = document.getElementById('erro');
+  if (!usuario || !senha) { erro.textContent = 'Preencha usuário e senha.'; erro.style.display = 'block'; return; }
+  btn.disabled = true;
+  btn.textContent = 'Verificando...';
+  erro.style.display = 'none';
+  try {
+    const res = await fetch('./usuarios.json?v=' + Date.now());
+    const dados = await res.json();
+    const user = dados.usuarios.find(u => u.usuario.toLowerCase() === usuario && u.senha === senha);
+    if (user) {
+      if (user.ativo === false) {
+        erro.textContent = 'Acesso desativado. Entre em contato com o suporte.';
+        erro.style.display = 'block';
+        btn.disabled = false; btn.textContent = 'Entrar'; return;
+      }
+      sessionStorage.setItem('eh_usuario', JSON.stringify({
+        nome: user.nome, plano: user.plano,
+        limite_msgs: user.limite_msgs || null, msgs_usadas: 0
+      }));
+      window.location.href = './dashboard.html';
+    } else {
+      erro.textContent = 'Usuário ou senha incorretos.';
+      erro.style.display = 'block';
+      btn.disabled = false; btn.textContent = 'Entrar';
+    }
+  } catch(e) {
+    erro.textContent = 'Erro ao verificar acesso. Tente novamente.';
+    erro.style.display = 'block';
+    btn.disabled = false; btn.textContent = 'Entrar';
+  }
+}
+</script>
+</body>
+</html>

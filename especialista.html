@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Especialista Técnico — EH Pro</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #08090f; --surface: #0f1018; --surface2: #14151f;
+    --border: #1e2035; --blue: #4f7fff; --blue-dim: #2a4db0;
+    --blue-glow: rgba(79,127,255,0.10); --text: #e8eaf5;
+    --muted: #6b6e8a; --user-bg: #141828; --error: #e74c3c;
+  }
+  body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+  header { padding: 12px 18px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; background: var(--surface); flex-shrink: 0; }
+  .back-btn { background: transparent; border: 1px solid var(--border); color: var(--muted); padding: 5px 10px; border-radius: 7px; font-size: 11px; cursor: pointer; transition: all 0.2s; font-family: 'DM Sans', sans-serif; }
+  .back-btn:hover { border-color: var(--blue); color: var(--blue); }
+  .logo-mark { width: 34px; height: 34px; background: linear-gradient(135deg, #2a4db0, #4f7fff); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-family: 'Syne', sans-serif; font-weight: 800; font-size: 13px; color: #fff; }
+  .header-info h1 { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 13px; }
+  .header-info p { font-size: 10px; color: var(--muted); margin-top: 1px; }
+  .header-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+  .status-dot { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--blue); }
+  .status-dot::before { content: ''; width: 6px; height: 6px; background: var(--blue); border-radius: 50%; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+  #chat { flex: 1; overflow-y: auto; padding: 20px 16px; display: flex; flex-direction: column; gap: 18px; scroll-behavior: smooth; }
+  #chat::-webkit-scrollbar { width: 4px; }
+  #chat::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+  .welcome-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 14px; padding: 20px; display: flex; flex-direction: column; gap: 14px; border-top: 3px solid var(--blue); }
+  .welcome-card h2 { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 15px; color: var(--blue); }
+  .welcome-card p { font-size: 13px; line-height: 1.7; color: var(--muted); }
+  .frentes { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .frente { background: var(--blue-glow); border: 1px solid var(--blue-dim); border-radius: 8px; padding: 8px 10px; font-size: 11.5px; color: var(--blue); }
+  .chips { display: flex; flex-wrap: wrap; gap: 7px; }
+  .chip { background: var(--blue-glow); border: 1px solid var(--blue-dim); color: var(--blue); padding: 5px 11px; border-radius: 20px; font-size: 11.5px; cursor: pointer; transition: all 0.2s; }
+  .chip:hover { background: rgba(79,127,255,0.2); border-color: var(--blue); }
+  .msg { display: flex; flex-direction: column; max-width: 88%; animation: fadeIn 0.3s ease; }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+  .msg.user { align-self: flex-end; }
+  .msg.assistant { align-self: flex-start; }
+  .msg-label { font-size: 10px; color: var(--muted); margin-bottom: 4px; letter-spacing: 0.08em; text-transform: uppercase; font-weight: 500; }
+  .msg.user .msg-label { text-align: right; }
+  .bubble { padding: 12px 15px; border-radius: 13px; font-size: 13.5px; line-height: 1.7; }
+  .msg.user .bubble { background: var(--user-bg); border: 1px solid #1e2540; color: var(--text); border-bottom-right-radius: 4px; }
+  .msg.assistant .bubble { background: var(--surface); border: 1px solid var(--border); color: var(--text); border-bottom-left-radius: 4px; }
+  .bubble strong { color: var(--blue); font-weight: 600; }
+  .typing-indicator { display: flex; gap: 5px; padding: 13px 15px; background: var(--surface); border: 1px solid var(--border); border-radius: 13px; border-bottom-left-radius: 4px; width: fit-content; }
+  .typing-indicator span { width: 6px; height: 6px; background: var(--muted); border-radius: 50%; animation: bounce 1.2s infinite; }
+  .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+  .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes bounce { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-6px)} }
+  .input-area { padding: 12px 14px; border-top: 1px solid var(--border); background: var(--surface); flex-shrink: 0; }
+  .input-row { display: flex; gap: 10px; align-items: flex-end; background: var(--surface2); border: 1px solid var(--border); border-radius: 13px; padding: 9px 13px; transition: border-color 0.2s; }
+  .input-row:focus-within { border-color: var(--blue-dim); }
+  #userInput { flex: 1; background: transparent; border: none; outline: none; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 13.5px; resize: none; max-height: 120px; line-height: 1.5; }
+  #userInput::placeholder { color: var(--muted); }
+  #sendBtn { width: 32px; height: 32px; background: var(--blue); border: none; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: opacity 0.2s; }
+  #sendBtn:hover { opacity: 0.85; }
+  #sendBtn:disabled { opacity: 0.3; cursor: default; }
+  #sendBtn svg { width: 15px; height: 15px; fill: #fff; }
+  .disclaimer { text-align: center; font-size: 10px; color: var(--muted); margin-top: 7px; opacity: 0.6; }
+</style>
+</head>
+<body>
+<header>
+  <button class="back-btn" onclick="window.location.href='./dashboard.html'">← Voltar</button>
+  <div class="logo-mark">EH</div>
+  <div class="header-info">
+    <h1>Especialista Técnico</h1>
+    <p>Equiparação Hospitalar · Análise completa</p>
+  </div>
+  <div class="header-right">
+    <div class="status-dot">Online</div>
+  </div>
+</header>
+
+<div id="chat">
+  <div class="welcome-card">
+    <h2>🏥 Especialista em Equiparação Hospitalar</h2>
+    <p>Sou seu consultor sênior silencioso. Atuo em <strong>5 frentes</strong> para aumentar sua capacidade técnica e estratégica com equiparação hospitalar.</p>
+    <div class="frentes">
+      <div class="frente">🔍 Análise de Elegibilidade</div>
+      <div class="frente">📋 Argumentação Fiscal</div>
+      <div class="frente">⚙️ Estruturação do Serviço</div>
+      <div class="frente">💬 Suporte Comercial</div>
+      <div class="frente" style="grid-column:1/-1">🛡️ Pós-venda e Segurança</div>
+    </div>
+    <div class="chips">
+      <div class="chip" onclick="sendChip(this)">Essa clínica é elegível?</div>
+      <div class="chip" onclick="sendChip(this)">Como explicar a equiparação pro médico?</div>
+      <div class="chip" onclick="sendChip(this)">Quais CNAEs permitem equiparação?</div>
+      <div class="chip" onclick="sendChip(this)">Riscos de autuação</div>
+      <div class="chip" onclick="sendChip(this)">Como precificar esse serviço?</div>
+      <div class="chip" onclick="sendChip(this)">Documentação necessária</div>
+    </div>
+  </div>
+</div>
+
+<div class="input-area">
+  <div class="input-row">
+    <textarea id="userInput" rows="1" placeholder="Descreva o caso ou faça sua pergunta técnica..." oninput="autoResize(this)" onkeydown="handleKey(event)"></textarea>
+    <button id="sendBtn" onclick="sendMessage()">
+      <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+    </button>
+  </div>
+  <p class="disclaimer">Agente técnico para contadores · Não substitui assessoria jurídica</p>
+</div>
+
+<script>
+const SYSTEM_PROMPT = `Você é o AGENTE ESPECIALISTA EM EQUIPARAÇÃO HOSPITALAR — um consultor sênior técnico-comercial desenhado para apoiar contadores que desejam oferecer, estruturar e escalar o serviço de equiparação hospitalar para médicos, clínicas e estabelecimentos de saúde.
+
+IDENTIDADE:
+- Consultor sênior silencioso — você aumenta a capacidade do contador, não substitui ele
+- Tom técnico, direto, confiável
+- Nunca promete resultado que não pode garantir
+- Sempre aponta riscos junto com oportunidades
+
+VOCÊ ATUA EM 5 FRENTES:
+
+1. ANÁLISE DE ELEGIBILIDADE
+Com base nas informações fornecidas, avalie:
+- Tipo de atividade exercida e CNAEs
+- Estrutura operacional (equipamentos, equipe, insumos)
+- Natureza dos serviços prestados
+- Processos que caracterizam atividade hospitalar
+Retorne: potencial (alto/médio/baixo), pontos de atenção, riscos e o que precisa ser ajustado
+
+2. APOIO TÉCNICO E ARGUMENTAÇÃO FISCAL
+- Explique o racional tributário da equiparação hospitalar
+- Organize o discurso técnico sem juridiquês excessivo
+- Diferencie equiparação de planejamento agressivo
+- Construa justificativas técnicas e defensáveis
+- Responda dúvidas do cliente com postura conservadora
+
+3. ESTRUTURAÇÃO DO SERVIÇO NO ESCRITÓRIO
+- Como posicionar equiparação como serviço premium
+- Fluxo interno: diagnóstico → validação → execução → acompanhamento
+- Como definir escopo e evitar que vire "favor no contrato mensal"
+- Estratégias de produto e precificação
+
+4. SUPORTE COMERCIAL (VENDA CONSULTIVA)
+- Como conversar com médicos sem prometer milagre
+- Como mostrar valor, não só economia de imposto
+- Como explicar riscos, limites e responsabilidades
+- Argumentos para fechamento
+- Como lidar com objeções: "meu contador nunca falou disso", "isso é seguro?", "não dá problema?"
+
+5. PÓS-VENDA E SEGURANÇA
+- Cuidados após implementação
+- Documentação, contratos e acompanhamento
+- Erros comuns que geram autuação
+- Postura técnica em fiscalizações
+
+CONTEXTO TÉCNICO:
+- Equiparação hospitalar permite alíquota de 8% de presunção de lucro (vs 32% padrão)
+- Exige que a clínica mantenha estrutura hospitalar: internação, UTI, centro cirúrgico OU equipamentos e processos que caracterizem atividade hospitalar
+- Regulamentada pelo RIR, Decreto 9.580/2018
+- CNAES relevantes: 8610-1/01, 8610-1/02, 8621-6/02, 8630-5/01 entre outros
+- Risco principal: não atender requisitos mínimos de estrutura e processo
+- Receita Federal pode questionar se não houver documentação robusta
+
+Responda em português brasileiro. Seja técnico, preciso e protetor do contador.`;
+
+const chatEl = document.getElementById('chat');
+let conversationHistory = [];
+let isLoading = false;
+
+// Verifica sessão
+const raw = sessionStorage.getItem('eh_usuario');
+if (!raw) window.location.href = './index.html';
+const sessao = JSON.parse(raw || '{}');
+
+function autoResize(el) { el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,120)+'px'; }
+function handleKey(e) { if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage();} }
+function sendChip(el) { document.getElementById('userInput').value=el.textContent; sendMessage(); }
+
+function addMessage(role, html) {
+  const div = document.createElement('div');
+  div.className = `msg ${role}`;
+  div.innerHTML = `<div class="msg-label">${role==='user'?sessao.nome:'Especialista EH'}</div><div class="bubble">${html}</div>`;
+  chatEl.appendChild(div);
+  chatEl.scrollTop = chatEl.scrollHeight;
+}
+
+function showTyping() {
+  const div = document.createElement('div');
+  div.className='msg assistant'; div.id='typing';
+  div.innerHTML='<div class="msg-label">Especialista EH</div><div class="typing-indicator"><span></span><span></span><span></span></div>';
+  chatEl.appendChild(div); chatEl.scrollTop=chatEl.scrollHeight;
+}
+
+function removeTyping() { const t=document.getElementById('typing'); if(t) t.remove(); }
+
+function formatResponse(text) {
+  return text
+    .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g,'<em>$1</em>')
+    .replace(/^## (.+)$/gm,'<strong style="color:var(--blue);font-size:14px;display:block;margin-top:12px;margin-bottom:5px;">$1</strong>')
+    .replace(/^### (.+)$/gm,'<strong style="font-size:13px;display:block;margin-top:8px;margin-bottom:3px;">$1</strong>')
+    .replace(/^[-•] (.+)$/gm,'<li>$1</li>')
+    .replace(/(<li>.*?<\/li>\n?)+/gs, m=>`<ul style="padding-left:18px;margin:6px 0;">${m}</ul>`)
+    .replace(/\n\n/g,'<br><br>').replace(/\n/g,'<br>');
+}
+
+async function sendMessage() {
+  const inputEl = document.getElementById('userInput');
+  const text = inputEl.value.trim();
+  if (!text || isLoading) return;
+  inputEl.value=''; inputEl.style.height='auto';
+  isLoading=true; document.getElementById('sendBtn').disabled=true;
+  addMessage('user', text.replace(/</g,'&lt;'));
+  conversationHistory.push({role:'user',content:text});
+  showTyping();
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:SYSTEM_PROMPT,messages:conversationHistory})
+    });
+    const data = await res.json();
+    removeTyping();
+    const reply = data.content?.[0]?.text || 'Erro ao processar.';
+    conversationHistory.push({role:'assistant',content:reply});
+    addMessage('assistant', formatResponse(reply));
+  } catch(e) {
+    removeTyping();
+    addMessage('assistant','⚠️ Erro de conexão. Tente novamente.');
+  }
+  isLoading=false; document.getElementById('sendBtn').disabled=false;
+  document.getElementById('userInput').focus();
+}
+</script>
+</body>
+</html>
