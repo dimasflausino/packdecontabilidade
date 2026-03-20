@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EH Pro — Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #08090f; --surface: #0f1018; --surface2: #14151f;
+    --border: #1e2035; --blue: #4f7fff; --blue-dim: #2a4db0;
+    --blue-glow: rgba(79,127,255,0.10); --text: #e8eaf5; --muted: #6b6e8a;
+    --green: #2ecc71; --green-dim: #1a7a42; --green-glow: rgba(46,204,113,0.10);
+    --error: #e74c3c; --gold: #f0b429;
+  }
+  body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; }
+  header {
+    padding: 14px 24px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 12px; background: var(--surface);
+  }
+  .logo-mark {
+    width: 36px; height: 36px; background: linear-gradient(135deg, #2a4db0, #4f7fff);
+    border-radius: 9px; display: flex; align-items: center; justify-content: center;
+    font-family: 'Syne', sans-serif; font-weight: 800; font-size: 14px; color: #fff;
+  }
+  .header-info h1 { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 14px; }
+  .header-info p { font-size: 11px; color: var(--muted); margin-top: 1px; }
+  .header-right { margin-left: auto; display: flex; gap: 10px; align-items: center; }
+  .badge-admin { background: rgba(231,76,60,0.1); border: 1px solid rgba(231,76,60,0.3); color: var(--error); padding: 3px 10px; border-radius: 20px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; }
+  .btn-sair { background: transparent; border: 1px solid var(--border); color: var(--muted); padding: 5px 12px; border-radius: 7px; font-size: 11px; cursor: pointer; transition: all 0.2s; font-family: 'DM Sans', sans-serif; }
+  .btn-sair:hover { border-color: var(--error); color: var(--error); }
+
+  main { max-width: 800px; margin: 0 auto; padding: 32px 20px; }
+
+  .section-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 16px; margin-bottom: 16px; color: var(--text); }
+
+  /* FORM NOVO USUÁRIO */
+  .novo-usuario-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 16px; padding: 24px; margin-bottom: 32px;
+    border-top: 3px solid var(--blue);
+  }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 16px; }
+  @media(max-width: 600px) { .form-grid { grid-template-columns: 1fr; } }
+  .field label { display: block; font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; font-weight: 500; }
+  .field input, .field select {
+    width: 100%; background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 9px; padding: 10px 12px; color: var(--text);
+    font-family: 'DM Sans', sans-serif; font-size: 13px; outline: none; transition: border-color 0.2s;
+  }
+  .field input:focus, .field select:focus { border-color: var(--blue-dim); }
+  .field select option { background: var(--surface2); }
+
+  .resultado-box {
+    background: var(--green-glow); border: 1px solid var(--green-dim);
+    border-radius: 10px; padding: 14px 16px; margin-bottom: 16px;
+    display: none; font-size: 13px;
+  }
+  .resultado-box strong { color: var(--green); display: block; margin-bottom: 8px; font-size: 14px; }
+  .credencial { background: var(--surface); border: 1px solid var(--border); border-radius: 7px; padding: 10px 12px; font-family: monospace; font-size: 13px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; }
+  .copy-btn { background: var(--blue-glow); border: 1px solid var(--blue-dim); color: var(--blue); padding: 3px 10px; border-radius: 5px; font-size: 11px; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+  .copy-btn:hover { background: rgba(79,127,255,0.2); }
+
+  .erro-box { background: rgba(231,76,60,0.08); border: 1px solid rgba(231,76,60,0.25); color: var(--error); border-radius: 10px; padding: 12px 16px; margin-bottom: 16px; display: none; font-size: 13px; }
+
+  .btn-criar { background: var(--blue); color: #fff; border: none; border-radius: 9px; padding: 11px 24px; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 13px; cursor: pointer; transition: opacity 0.2s; }
+  .btn-criar:hover { opacity: 0.85; }
+  .btn-criar:disabled { opacity: 0.4; cursor: default; }
+
+  /* LISTA DE USUÁRIOS */
+  .lista-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; }
+  .lista-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+  .lista-header span { font-size: 12px; color: var(--muted); }
+  .btn-refresh { background: transparent; border: 1px solid var(--border); color: var(--muted); padding: 5px 12px; border-radius: 7px; font-size: 11px; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; }
+  .btn-refresh:hover { border-color: var(--blue); color: var(--blue); }
+
+  .user-row { padding: 14px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 14px; }
+  .user-row:last-child { border-bottom: none; }
+  .user-avatar { width: 36px; height: 36px; background: var(--blue-glow); border: 1px solid var(--blue-dim); border-radius: 9px; display: flex; align-items: center; justify-content: center; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 14px; color: var(--blue); flex-shrink: 0; }
+  .user-info { flex: 1; }
+  .user-info strong { display: block; font-size: 13px; font-weight: 600; }
+  .user-info span { font-size: 11px; color: var(--muted); }
+  .user-actions { display: flex; gap: 8px; align-items: center; }
+  .badge-ativo { background: var(--green-glow); border: 1px solid var(--green-dim); color: var(--green); padding: 2px 9px; border-radius: 20px; font-size: 10px; font-weight: 600; }
+  .badge-inativo { background: rgba(231,76,60,0.1); border: 1px solid rgba(231,76,60,0.3); color: var(--error); padding: 2px 9px; border-radius: 20px; font-size: 10px; font-weight: 600; }
+  .btn-toggle { background: transparent; border: 1px solid var(--border); color: var(--muted); padding: 4px 10px; border-radius: 6px; font-size: 11px; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; }
+  .btn-toggle:hover { border-color: var(--gold); color: var(--gold); }
+  .btn-delete { background: transparent; border: 1px solid rgba(231,76,60,0.3); color: var(--error); padding: 4px 10px; border-radius: 6px; font-size: 11px; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; }
+  .btn-delete:hover { background: rgba(231,76,60,0.1); }
+
+  .empty-state { padding: 32px; text-align: center; color: var(--muted); font-size: 13px; }
+  .loading { padding: 24px; text-align: center; color: var(--muted); font-size: 13px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-mark">EH</div>
+  <div class="header-info">
+    <h1>Painel Admin — EH Pro</h1>
+    <p>Gerenciamento de usuários</p>
+  </div>
+  <div class="header-right">
+    <span class="badge-admin">Admin</span>
+    <button class="btn-sair" onclick="sair()">Sair</button>
+  </div>
+</header>
+
+<main>
+  <!-- CRIAR USUÁRIO -->
+  <div class="section-title">➕ Novo usuário</div>
+  <div class="novo-usuario-card">
+    <div class="form-grid">
+      <div class="field">
+        <label>Nome completo</label>
+        <input type="text" id="novo-nome" placeholder="João Silva" />
+      </div>
+      <div class="field">
+        <label>Usuário (login)</label>
+        <input type="text" id="novo-usuario" placeholder="joaosilva ou email" />
+      </div>
+    </div>
+
+    <div class="erro-box" id="erro-criar"></div>
+    <div class="resultado-box" id="resultado-criar">
+      <strong>✅ Usuário criado! Copie as credenciais abaixo:</strong>
+      <div class="credencial">
+        <span>Usuário: <strong id="res-usuario"></strong></span>
+        <button class="copy-btn" onclick="copiar('res-usuario')">Copiar</button>
+      </div>
+      <div class="credencial">
+        <span>Senha: <strong id="res-senha"></strong></span>
+        <button class="copy-btn" onclick="copiar('res-senha')">Copiar</button>
+      </div>
+      <div class="credencial">
+        <span>Link: <strong id="res-link"></strong></span>
+        <button class="copy-btn" onclick="copiar('res-link')">Copiar</button>
+      </div>
+    </div>
+
+    <button class="btn-criar" id="btn-criar" onclick="criar_usuario()">Criar usuário e gerar senha</button>
+  </div>
+
+  <!-- LISTA -->
+  <div class="section-title">👥 Usuários cadastrados</div>
+  <div class="lista-card">
+    <div class="lista-header">
+      <span id="total-usuarios">Carregando...</span>
+      <button class="btn-refresh" onclick="carregar_usuarios()">↻ Atualizar</button>
+    </div>
+    <div id="lista-usuarios"><div class="loading">Carregando...</div></div>
+  </div>
+</main>
+
+<script>
+const SUPABASE_URL = 'https://lswkhabfkdgsnsocfiot.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxzd2toYWJma2Rnc25zb2NmaW90Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5OTEyMTEsImV4cCI6MjA4OTU2NzIxMX0.qotVaSDzUDmFaBJMM4ts1jHoXlfY1v7EZ9k2QNR_zME';
+const HEADERS = { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' };
+
+// Verifica se é admin
+const raw = sessionStorage.getItem('eh_usuario');
+if (!raw) { window.location.href = './index.html'; }
+const sessao = JSON.parse(raw || '{}');
+if (!sessao.is_admin) { window.location.href = './dashboard.html'; }
+
+function gerar_senha() {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
+  let senha = '';
+  for (let i = 0; i < 8; i++) senha += chars[Math.floor(Math.random() * chars.length)];
+  return senha;
+}
+
+async function criar_usuario() {
+  const nome = document.getElementById('novo-nome').value.trim();
+  const usuario = document.getElementById('novo-usuario').value.trim().toLowerCase().replace(/\s/g, '');
+  const erro = document.getElementById('erro-criar');
+  const resultado = document.getElementById('resultado-criar');
+  const btn = document.getElementById('btn-criar');
+
+  erro.style.display = 'none'; resultado.style.display = 'none';
+
+  if (!nome || !usuario) { erro.textContent = 'Preencha nome e usuário.'; erro.style.display = 'block'; return; }
+
+  const senha = gerar_senha();
+  btn.disabled = true; btn.textContent = 'Criando...';
+
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/usuarios`, {
+      method: 'POST',
+      headers: { ...HEADERS, 'Prefer': 'return=minimal' },
+      body: JSON.stringify({ nome, usuario, senha, plano: 'pro', ativo: true })
+    });
+
+    if (res.ok) {
+      document.getElementById('res-usuario').textContent = usuario;
+      document.getElementById('res-senha').textContent = senha;
+      document.getElementById('res-link').textContent = window.location.origin + '/index.html';
+      resultado.style.display = 'block';
+      document.getElementById('novo-nome').value = '';
+      document.getElementById('novo-usuario').value = '';
+      carregar_usuarios();
+    } else {
+      const err = await res.json();
+      if (err.code === '23505') {
+        erro.textContent = 'Esse usuário já existe. Escolha outro.';
+      } else {
+        erro.textContent = 'Erro ao criar usuário. Tente novamente.';
+      }
+      erro.style.display = 'block';
+    }
+  } catch(e) {
+    erro.textContent = 'Erro de conexão.'; erro.style.display = 'block';
+  }
+
+  btn.disabled = false; btn.textContent = 'Criar usuário e gerar senha';
+}
+
+async function carregar_usuarios() {
+  document.getElementById('lista-usuarios').innerHTML = '<div class="loading">Carregando...</div>';
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/usuarios?order=criado_em.desc&select=*`, { headers: HEADERS });
+    const usuarios = await res.json();
+    const nao_admin = usuarios.filter(u => u.usuario !== 'admin');
+    document.getElementById('total-usuarios').textContent = `${nao_admin.length} usuário(s) cadastrado(s)`;
+
+    if (nao_admin.length === 0) {
+      document.getElementById('lista-usuarios').innerHTML = '<div class="empty-state">Nenhum usuário cadastrado ainda.</div>';
+      return;
+    }
+
+    document.getElementById('lista-usuarios').innerHTML = nao_admin.map(u => `
+      <div class="user-row" id="row-${u.id}">
+        <div class="user-avatar">${u.nome[0].toUpperCase()}</div>
+        <div class="user-info">
+          <strong>${u.nome}</strong>
+          <span>${u.usuario} · ${u.plano.toUpperCase()} · criado em ${new Date(u.criado_em).toLocaleDateString('pt-BR')}</span>
+        </div>
+        <div class="user-actions">
+          <span class="${u.ativo ? 'badge-ativo' : 'badge-inativo'}">${u.ativo ? 'Ativo' : 'Inativo'}</span>
+          <button class="btn-toggle" onclick="toggle_usuario('${u.id}', ${u.ativo})">${u.ativo ? 'Desativar' : 'Ativar'}</button>
+          <button class="btn-delete" onclick="deletar_usuario('${u.id}', '${u.nome}')">Excluir</button>
+        </div>
+      </div>
+    `).join('');
+  } catch(e) {
+    document.getElementById('lista-usuarios').innerHTML = '<div class="empty-state">Erro ao carregar usuários.</div>';
+  }
+}
+
+async function toggle_usuario(id, ativo_atual) {
+  await fetch(`${SUPABASE_URL}/rest/v1/usuarios?id=eq.${id}`, {
+    method: 'PATCH', headers: HEADERS,
+    body: JSON.stringify({ ativo: !ativo_atual })
+  });
+  carregar_usuarios();
+}
+
+async function deletar_usuario(id, nome) {
+  if (!confirm(`Excluir ${nome}? Esta ação não pode ser desfeita.`)) return;
+  await fetch(`${SUPABASE_URL}/rest/v1/usuarios?id=eq.${id}`, { method: 'DELETE', headers: HEADERS });
+  carregar_usuarios();
+}
+
+function copiar(id) {
+  const texto = document.getElementById(id).textContent;
+  navigator.clipboard.writeText(texto);
+  event.target.textContent = 'Copiado!';
+  setTimeout(() => event.target.textContent = 'Copiar', 2000);
+}
+
+function sair() { sessionStorage.removeItem('eh_usuario'); window.location.href = './index.html'; }
+
+carregar_usuarios();
+</script>
+</body>
+</html>
